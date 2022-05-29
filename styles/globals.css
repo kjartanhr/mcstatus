@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.flag {
+	/*box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);*/
+	margin-top: 5px;
+	border: 1px solid rgba(0, 0, 0, 0.10);
+	height: 30px;
+}
+
+.link {
+	@apply bg-indigo-100 hover:bg-indigo-200 w-auto transition duration-150 p-0.5 rounded-sm;
+}
+
+.footer-link {
+	@apply bg-indigo-100 hover:bg-indigo-200 w-auto transition duration-150 py-0.5 px-1.5 rounded-sm;
+}
+
+.pill {
+	@apply bg-green-200 w-auto p-0.5 rounded-sm;
+}
+
+.pill-red {
+	@apply bg-red-200 w-auto p-0.5 rounded-sm;
+}
