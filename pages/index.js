@@ -1,11 +1,13 @@
 import Head from 'next/head'
-import { ArrowRightIcon, ChevronDownIcon } from '@heroicons/react/outline'
+import { ArrowRightIcon, ChevronDownIcon, ShareIcon } from '@heroicons/react/outline'
 import Layout from '../components/Layout'
 import { motdParser } from '@sfirew/mc-motd-parser'
 import { useState, useEffect } from "react";
 import isFQDN from 'validator/lib/isFQDN'
 import isIP from 'validator/lib/isIP'
 import DOMPurify from 'isomorphic-dompurify';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import Snackbar from '@mui/material/Snackbar';
 
 export default function Index(props) {
 	const [showCard, setShowCard] = useState(false);
@@ -91,7 +93,7 @@ export default function Index(props) {
 							props.props.data.query.host + (props.props.data.query.port !== 25565 ? ':' + props.props.data.query.port : '') + ' | MCStatus'
 						} />
 						<meta property="og:description" content={props.props.data.query.host + ' is currently online and has ' + props.props.data.players.online + ' online players out of ' + props.props.data.players.max + '.'} />
-						<meta property="og:image" content={data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
+						<meta property="og:image" content={props?.props?.data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
 					</>}
 
 					{(props?.props?.data.offline) && <>
@@ -106,9 +108,9 @@ export default function Index(props) {
 							props.props.data.query.host + (props.props.data.query.port !== 25565 ? ':' + props.props.data.query.port : '') + ' | MCStatus'
 						} />
 						<meta property="og:description" content={props.props.data.query.host + ' is currently offline.'} />
-						<meta property="og:image" content={data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
+						<meta property="og:image" content={props?.props?.data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
 					</>}
-					<link rel="icon" href={data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
+					<link rel="icon" href={props?.props?.data?.favicon && '/api/icon/dynamic?address=' + props.props.data.query.host + ':' + props.props.data.query.port || '/api/icon/dynamic?address=default'} />
 				</>}
 			</Head>
 			<div className="w-full">
@@ -141,6 +143,7 @@ export default function Index(props) {
 										<label htmlFor="legacy" className="text-gray-700">Legacy server</label>
 									</div>
 								</div>
+								<p className="mt-1 text-xs text-gray-500">Use the &apos;Legacy&apos; option for servers older than 1.7.2.</p>
 							</form>
 						</div>
 						<Card hidden={!showCard} res={data} />
@@ -153,6 +156,7 @@ export default function Index(props) {
 
 export function Card({hidden, res}) {
 	const [expanded, setExpanded] = useState(false);
+	const [snack, setSnack] = useState(false);
 
 	function createInfoMarkup(info) {
 		let r = '';
@@ -202,6 +206,10 @@ export function Card({hidden, res}) {
 	else if (!hidden) return <div className={`max-w-3xl mx-auto pt-8 ${hidden && 'hidden'}`}>
 		<div className="shadow rounded">
 			<div className="px-6 pt-6 bg-white rounded-t">
+				<CopyToClipboard text={'https://mcstatus.co/' + res.query.host + (res.query.port !== 25565 ? ':' + res.query.port : '')}
+					onCopy={() => setSnack(true)}>
+					<button className="mb-2 p-1 px-2 bg-indigo-300 bg-opacity-60 flex items-center gap-2 text-indigo-500 font-medium rounded hover:bg-opacity-50 transition duration-150 active:bg-opacity-40">Share <ShareIcon className="h-4 w-4" /></button>
+				</CopyToClipboard>
 				<div className="flex">
 					<h2 className="text-2xl font-semibold">{res.query.host}{res.query.port !== 25565 ? ':' + res.query.port : ''} <span className="pill text-base uppercase">Online</span></h2>
 					<div className="flex flex-grow justify-end">
@@ -291,5 +299,12 @@ export function Card({hidden, res}) {
 			</div>
 			<button onClick={() => setExpanded(!expanded)} className="rounded bg-white w-full flex items-center justify-center gap-2 p-4 border-t border-gray-100 text-sm font-medium hover:bg-opacity-50 transition duration-150">Expand <ChevronDownIcon className={`h-4 w-4 transform ${expanded ? 'rotate-180' : 'rotate-0'} transition duration-150`} /></button>
 		</div>
+		<Snackbar
+			anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+			open={snack}
+			onClose={() => setSnack(false)}
+			message="Copied to clipboard"
+			key={'bottomcenter'}
+		/>
 	</div>
 }
